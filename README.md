@@ -1,39 +1,101 @@
 # bagel-mini Shaders Collection
 
-Shaders for MustardOS
+Shader Presets for MustardOS/Pickles
 
-<!-- Short description of the pack goes here. -->
+A collection of (hopefully) useful CRT and LCD shaders for lower resolution screen handhelds powered by MustardOS. 
 
-## Shaders
-
-### CRT
-
-| Shader | Preset |
-| --- | --- |
-| `bagel-CRT-mini-v3` | Dither Merge off |
-| `bagel-COMPOSITE-mini-v3` | Dither Merge on |
-| `bagel-RF-mini-v3` | Dither Merge, Dot Crawl, Noise, RF Ghosting (Motion) and Vertical Roll on |
-
-### LCD
-
-| Shader | Preset |
-| --- | --- |
-| `bagel-LCD-mini-v5` | |
-| `bagel-LCD-mini-border-v5` | Border Fade on |
-| `bagel-LCD-mini-background-v5` | Border Fade and LCD Background (Warm) on |
-| `bagel-LCD-mini-dirty-v5` | Border Fade, LCD Background (Green) and Fake Ghosting on |
+This is not a professional work, and while I like things to be organized, I will just explain stuff as informally as it was all done.
+The technical stuff is all described in the shader files, feel free to check and propose changes for the better! 
 
 ## Installation
 
-<!-- How to install. -->
+While running a game in Pickles, open the quick menu, go to Settings, Visual 3/7, open the shader menu, go to downloads, and look for these shaders there. 
 
-## Parameters
+If you don't have access to wifi on your device, you can copy any of the `.frag` files from here to `/muos/save/pickles/shader` and to `/muos/save/wasabi/shader` and and they will be available to use.
 
-<!-- Parameter notes. -->
+## Shaders
+
+### Good to know
+
+Both shaders (bagel-CRT-mini and bagel-LCD-mini) are built with scaling in consideration, so you shouldn't need any other external method to have balanced pixels when the content is not integer scaled to the screen resolution. 
+The masks/scanlines/grids were thought to consider both the internal game resolution and the screen output resolution to align and avoid shimmering artifacts whenever possible. 
+That said, using the `Aspect Ratio` as the scaling mode in Pickles, locks the height to an integer multiple of the content to the screen, and will provide cleaner results, also giving more processing headroom since there's less filtering happening. That can be helpful to some of the more _fun_ parameters available, as they can be pretty demanding.
+
+Since Pickles don't have a function to share shader presets yet, each preset is just the whole shader with some parameters tweaked, meaning that whatever you like from one preset can be toggled/adjusted to be the same in another, so test stuff around and have fun! 
+
+### CRT (`bagel-CRT-mini`)
+
+Here I was mostly inspired by the fake-CRT-Geom shader. 
+I always liked the crt borders effect in the little 3.5" screens, it gave them depth, but they never had enough pixels to give a good corner warp to the picture. I "solved" that using a mask that simulates the black geom borders by covering a bit of the picture, but never distorts the image itself. Since most games account for overscan, it works fine almost every time. When it doesn't and you miss some important info on the game, or if you just don't like the geom border, there is the `border` parameter, and you can use it to select a subtle border with rounded corners, or no border at all. 
+
+I also spent a lot of time finding a good enough solution for having those nice composite dither patterns, usually found on Mega Drive gamnes, to blend and be displayed as those pretty extra colours, so don't pass on checking how your games will look with the `Dither` parameter on! 
+
+| Shader | Preset |
+| --- | --- |
+| `bagel-CRT-mini` | Default |
+| `bagel-CRT-mini-GoodDither` | Dither Merge on |
+| `bagel-CRT-mini-Composite` | Dither Merge, Dot Crawl, RF Ghosting (Static) on |
+| `bagel-CRT-mini-RF` | Dither Merge, Noise and RF Ghosting (Motion) on |
+| `bagel-CRT-mini-BadRF` | Dither Merge, Dot Crawl, Noise, RF Ghosting (Motion) and Vertical Roll on |
+
+Some fun parameters to consider:
+
+- Dither Merge:  Blends dither columns into a smooth picture. _Sonic 2's transparent waterfall said hi._
+- Dot Crawl:     The dither creeps slowly side to side, like composite video. Needs Dither Merge to be on.
+- Noise:         Analogue noise on top of the picture.
+- RF Ghosting:   Faint echoes trailing. Static for a still ghost, Motion adds slow random drifts.
+- Vertical Roll: Now and then the picture rolls, like a TV losing vertical sync. It always gets you during a tough jump lol
+- Border:        Geom (rounded corners on the curved shape), Corner (rounded corners) or Flat (soft edge fade).
+- Scan Grid:     Auto / 240 / 480. If the mask/scanlines effect seems off, too big or too small, or even gone, the shader failed to auto detect the correct ratio from content to screen, so tweak this and one of the options should get you going. 
+
+### LCD (`bagel-LCD-mini`)
+
+Inspired by the lcd3x rgb grid, this started as a simple way to have games from older handhelds scaled to full screen with good pixel balancing and a grid that worked well on a non-integer situation. 
+The pixel transparency craze happened around me, as I had never used those shaders myself, but I liked the screenshots and pictures people were posting around with that on, so I dabbled in the idea of having a paper background option, where dark pixels would cast their shadow, and white pixels would gain some texture. It worked out fine, and now I'm always checking how the lcd background option looks in every game I try! I just didn't like it with the RGB grid, so I looked at getting something similar to lcd1x, what led to the grid RGBxMono toggle. Having options is good, right? (•‿•) 
+Adding a ghosting effect was a suggestion by XongleBongle the man himself, but since every handheld core already has an interframe blending option for accurate ghosting, I tried to get that bad duplicate image I used to deal with, from the terrible screen on my Dingoo A320 (is that the correct model I had?), and it ended up being a fine addition to the fun options of this LCD shader! 
+
+| Shader | Preset |
+| --- | --- |
+| `bagel-LCD-mini` | RGB grid |
+| `bagel-LCD-mini-Background` | Mono grid, LCD Background (Warm) on |
+| `bagel-LCD-mini-FakeGhost` | Mono grid, Fake Ghosting on |
+| `bagel-LCD-mini-BadDisplay` | Mono grid, LCD Background (Warm) and Fake Ghosting on |
+
+Some fun parameters to consider:
+
+- Grid Style:     RGB (lcd3x style) or Mono (lcd1x style).
+- Border Fade:    Rounded darkening at the screen edges. Good to make the picture blend with the edges of the screen. 
+- LCD Background: Clear pixels let a paper-coloured backing show through, dark pixels leave a shade in that background
+- Fake Ghosting:  Fake, not a real previous-frame effect, simulates a bad LCD display. 
+- Grid Mode:      Auto / 240 / 480. If the grid effect seems off, too big or too small, or even gone, the shader failed to auto detect the correct ratio from content to screen, so tweak this and one of the options should get you going. 
 
 ## Overlays
 
-<!-- Overlay notes, one folder per resolution. -->
+I also have a simple pair of scanlines and grid overlays for 640x480 and 1280x720 (can be used in 720x720 with the proper scaling) screens.
+Some systems are just too demanding to also have a shader running, like Dreamcast and N64, and having these on can give them that nice TV look at an (almost) free performance cost. 
+Paired with Pickles' pretty robust picture options, like contrast, saturation and others, you can get a good _old school_ look for even the most demanding systems. 
+
+| Overlay | 640x480 | 1280x720 |
+| --- | --- | --- |
+| Grid | `overlays/640x480/simple-grid-640x480.png` | `overlays/1280x720/simple-grid-1280x720.png` |
+| Scanlines | `overlays/640x480/simple-scanlines-640x480.png` | `overlays/1280x720/simple-scanlines-1280x720.png` |
+
+Installing them works the same as the shaders (see Installation above).
+
+## A little backstory
+
+With the introduction of the overlay/shader system in MustardOS, I began modifying some of XongleBongle's included shaders to resemble some of my favorite presets from RetroArch, some cool LCD and CRT shaders to use on content that was not run through RetroArch itself. Some PortMaster stuff and external emulators worked well with them, and I was happy with the experiment! 
+
+When Pickles arrived, it was an incredible frontend for the libretro cores, only missing the shaders I got used to on my retro systems. 
+With that, I started piecing together and translating pieces of the shaders I liked the most on my handhelds, with an honorable mention to the fake/mini set of CRT shaders. It was also where the name came from, since I go by bgelmini, and people usually call me bagel on Discord, it was natural that those would be the bagel-mini shader presets. 
+
+Instead of directly porting the shaders as is, I thought of taking what I like the best from many of those sources and creating shader presets that were ready for my games, with just the parameters that I would really tweak, and thinking on the handheld screen sizes and resolutions first. 
+
+Unfortunately that reached a point where it was above what I could piece together on my own, so before giving up I started experimenting with Claude to check what could be done, and the results were actually pretty good. I checked, tested and re-tested everything, read through code and tried to at least understand where it all was coming from, but I used a ton of AI in the process, let that be clear. 
+
+I really like the results, and there's a bunch of stuff that was not lifted directly from other shaders, and although those are fully fledged shaders, since it is not my own code and Claude was probably checking a lot of code from shaders all over the web, my process was more like creating shader presets, in the same manner you could edit a bunch of shaders in RetroArch, save and share your presets to anyone. 
+
+I'm happy if I'm the only one using those, but I bet some of you may like them too, so here we are! 
 
 ## Credits and licensing
 
@@ -43,14 +105,12 @@ The shaders in this repository are licensed under GPL-3.0-or-later (see `LICENSE
 | --- | --- | --- | --- |
 | CRT family | `fake-CRT-Geom` | DariusG | GPL-2.0-or-later |
 | CRT family | `kaizer-lp-small` (NTSC blur) | DariusG | GPL-2.0-or-later |
-| CRT family | `tiny_ntsc` (NTSC dither), [sbtl_shaders](https://github.com/vsvsv/sbtl_shaders) | DariusG / Vsevolod | MIT, Copyright (c) 2025 Vsevolod |
+| CRT family | `tiny_ntsc` (NTSC dither), [sbtl_shaders](https://github.com/vsvsv/sbtl_shaders) | Vsevolod (vsvsv) | MIT, Copyright (c) 2025 Vsevolod |
 | CRT and LCD | `Sharp-Shimmerless-Shader` | zadpos | Public domain |
 | LCD family (RGB grid) | [`lcd3x`](https://github.com/gigaherz/lcd3x) | Gigaherz | BSD 3-Clause, Copyright (c) 2012 David Quintana |
 | LCD family (Mono grid) | [`lcd1x`](https://github.com/libretro/slang-shaders/blob/master/handheld/shaders/lcd1x.slang) | Gigaherz, edited by jdgleaver | GPL-2.0-or-later |
 | LCD family (LCD Background) | `Pixel Transparency` | mattakins | Inspiration only, no code used |
-| All | bagel shaders | bgelmini / ClaudeAI | GPL-3.0-or-later |
-
-<!-- Verify: who wrote the tiny_ntsc code in sbtl_shaders. Also update the CRT shader headers: Sharp-Shimmerless author is zadpos, not Woohyun Kang. -->
+| All | bagel-mini shaders | bgelmini / ClaudeAI | GPL-3.0-or-later |
 
 ### lcd3x (BSD 3-Clause)
 
