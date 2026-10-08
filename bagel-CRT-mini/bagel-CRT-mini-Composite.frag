@@ -1,8 +1,9 @@
-// Name: bagel-CRT-mini
+// Name: bagel-CRT-mini-Composite
 // Author: bgelmini
 // Version 3.0
 
 // Co-author: ClaudeAI
+// Preset from bgael-CRT-mini
 // Ported from "fake-CRT-Geom" by DariusG, with sprinkles from "Sharp-Shimmerless-Shader" by zadpos
 // NTSC dither/blur based on "tiny_ntsc" by Vsevolod and "kaizer-lp-small" by DariusG
 
