@@ -1,6 +1,6 @@
-# bagel shaders
+# bagel-mini Shaders Collection
 
-Shaders for MustardOS (Pickles) handhelds.
+Shaders for MustardOS
 
 <!-- Short description of the pack goes here. -->
 
