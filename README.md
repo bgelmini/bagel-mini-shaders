@@ -1,40 +1,60 @@
-# bagel-mini-shaders
-Collection of shaders and overlays for MustardOS 
+# bagel shaders
+
+Shaders for MustardOS (Pickles) handhelds.
 
 <!-- Short description of the pack goes here. -->
-Shaders
-CRT
-Shader	Preset
-bagel-CRT-mini-v3	Dither Merge off
-bagel-COMPOSITE-mini-v3	Dither Merge on
-bagel-RF-mini-v3	Dither Merge, Dot Crawl, Noise, RF Ghosting (Motion) and Vertical Roll on
-LCD
-Shader	Preset
-bagel-LCD-mini-v5	
-bagel-LCD-mini-border-v5	Border Fade on
-bagel-LCD-mini-background-v5	Border Fade and LCD Background (Warm) on
-bagel-LCD-mini-dirty-v5	Border Fade, LCD Background (Green) and Fake Ghosting on
-Installation
+
+## Shaders
+
+### CRT
+
+| Shader | Preset |
+| --- | --- |
+| `bagel-CRT-mini-v3` | Dither Merge off |
+| `bagel-COMPOSITE-mini-v3` | Dither Merge on |
+| `bagel-RF-mini-v3` | Dither Merge, Dot Crawl, Noise, RF Ghosting (Motion) and Vertical Roll on |
+
+### LCD
+
+| Shader | Preset |
+| --- | --- |
+| `bagel-LCD-mini-v5` | |
+| `bagel-LCD-mini-border-v5` | Border Fade on |
+| `bagel-LCD-mini-background-v5` | Border Fade and LCD Background (Warm) on |
+| `bagel-LCD-mini-dirty-v5` | Border Fade, LCD Background (Green) and Fake Ghosting on |
+
+## Installation
+
 <!-- How to install. -->
-Parameters
+
+## Parameters
+
 <!-- Parameter notes. -->
-Overlays
+
+## Overlays
+
 <!-- Overlay notes, one folder per resolution. -->
-Credits and licensing
 
-The shaders in this repository are licensed under GPL-3.0-or-later (see LICENSE). They include code from the projects below, which keep their own notices. The credit lines are also in the header of every shader.
+## Credits and licensing
 
-Shaders	Based on	Author	License
-CRT family	fake-CRT-Geom	DariusG	GPL-2.0-or-later
-CRT family	kaizer-lp-small (NTSC blur)	DariusG	GPL-2.0-or-later
-CRT family	tiny_ntsc (NTSC dither), sbtl_shaders	DariusG / Vsevolod	MIT, Copyright (c) 2025 Vsevolod
-CRT and LCD	Sharp-Shimmerless-Shader	zadpos	Public domain
-LCD family (RGB grid)	lcd3x	Gigaherz	BSD 3-Clause, Copyright (c) 2012 David Quintana
-LCD family (Mono grid)	lcd1x	Gigaherz, edited by jdgleaver	GPL-2.0-or-later
-LCD family (LCD Background)	Pixel Transparency	mattakins	Inspiration only, no code used
-All	bagel shaders	bgelmini / ClaudeAI	GPL-3.0-or-later
+The shaders in this repository are licensed under GPL-3.0-or-later (see `LICENSE`). They include code from the projects below, which keep their own notices. The credit lines are also in the header of every shader.
+
+| Shaders | Based on | Author | License |
+| --- | --- | --- | --- |
+| CRT family | `fake-CRT-Geom` | DariusG | GPL-2.0-or-later |
+| CRT family | `kaizer-lp-small` (NTSC blur) | DariusG | GPL-2.0-or-later |
+| CRT family | `tiny_ntsc` (NTSC dither), [sbtl_shaders](https://github.com/vsvsv/sbtl_shaders) | DariusG / Vsevolod | MIT, Copyright (c) 2025 Vsevolod |
+| CRT and LCD | `Sharp-Shimmerless-Shader` | zadpos | Public domain |
+| LCD family (RGB grid) | [`lcd3x`](https://github.com/gigaherz/lcd3x) | Gigaherz | BSD 3-Clause, Copyright (c) 2012 David Quintana |
+| LCD family (Mono grid) | [`lcd1x`](https://github.com/libretro/slang-shaders/blob/master/handheld/shaders/lcd1x.slang) | Gigaherz, edited by jdgleaver | GPL-2.0-or-later |
+| LCD family (LCD Background) | `Pixel Transparency` | mattakins | Inspiration only, no code used |
+| All | bagel shaders | bgelmini / ClaudeAI | GPL-3.0-or-later |
+
 <!-- Verify: who wrote the tiny_ntsc code in sbtl_shaders. Also update the CRT shader headers: Sharp-Shimmerless author is zadpos, not Woohyun Kang. -->
-lcd3x (BSD 3-Clause)
+
+### lcd3x (BSD 3-Clause)
+
+```
 Copyright (c) 2012, David Quintana <gigaherz@gmail.com>
 All rights reserved.
 
@@ -60,7 +80,11 @@ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
 CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
-sbtl_shaders (MIT)
+```
+
+### sbtl_shaders (MIT)
+
+```
 MIT License
 
 Copyright (c) 2025 Vsevolod
@@ -82,6 +106,8 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-GPL-2.0-or-later parts
+```
 
-fake-CRT-Geom, kaizer-lp-small and lcd1x are free software under the GNU General Public License, version 2 or (at your option) any later version. They are used here under version 3, as the "or later" clause allows. The full texts are at https://www.gnu.org/licenses/old-licenses/gpl-2.0.html and https://www.gnu.org/licenses/gpl-3.0.html.
+### GPL-2.0-or-later parts
+
+`fake-CRT-Geom`, `kaizer-lp-small` and `lcd1x` are free software under the GNU General Public License, version 2 or (at your option) any later version. They are used here under version 3, as the "or later" clause allows. The full texts are at <https://www.gnu.org/licenses/old-licenses/gpl-2.0.html> and <https://www.gnu.org/licenses/gpl-3.0.html>.
