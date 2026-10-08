@@ -1,4 +1,4 @@
-// Name: bagel-CRT-mini
+// Name: bagel-CRT-mini-RF
 // Author: bgelmini
 // Version 3.0
 
