@@ -20,7 +20,7 @@
 // Fake Ghosting:  Spatial fake, not a real previous-frame effect, simulates a bad LCD display. 
 
 #pragma parameter sharpness "Sharpness" 1.0 0.3 1.0 0.05
-#pragma parameter saturation "Saturation" 0.6 0.0 2.0 0.05
+#pragma parameter saturation "Saturation" 0.9 0.0 2.0 0.05
 #pragma parameter brightness "Brightness" 1.0 0.5 2.5 0.05
 #pragma parameter contrast "Contrast" 1.0 0.5 2.0 0.05
 #pragma parameter scan_grid "Grid Mode (Auto/240/480)" 0.0 0.0 2.0 1.0
