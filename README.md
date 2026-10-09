@@ -1,6 +1,6 @@
 # bagel-mini Shaders Collection
 
-Shader Presets for MustardOS/Pickles
+Shader Presets for MustardOS/Pickles/Wasabi
 
 A collection of (hopefully) useful CRT and LCD shaders for lower resolution screen handhelds powered by MustardOS. 
 
