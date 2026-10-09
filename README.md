@@ -18,7 +18,9 @@ If you don't have access to wifi on your device, you can copy any of the `.frag`
 ### Good to know
 
 Both shaders (bagel-CRT-mini and bagel-LCD-mini) are built with scaling in consideration, so you shouldn't need any other external method to have balanced pixels when the content is not integer scaled to the screen resolution. 
+
 The masks/scanlines/grids were thought to consider both the internal game resolution and the screen output resolution to align and avoid shimmering artifacts whenever possible. 
+
 That said, using the `Aspect Ratio` as the scaling mode in Pickles, locks the height to an integer multiple of the content to the screen, and will provide cleaner results, also giving more processing headroom since there's less filtering happening. That can be helpful to some of the more _fun_ parameters available, as they can be pretty demanding.
 
 Since Pickles don't have a function to share shader presets yet, each preset is just the whole shader with some parameters tweaked, meaning that whatever you like from one preset can be toggled/adjusted to be the same in another, so test stuff around and have fun! 
@@ -51,7 +53,9 @@ Some fun parameters to consider:
 ### LCD (`bagel-LCD-mini`)
 
 Inspired by the lcd3x rgb grid, this started as a simple way to have games from older handhelds scaled to full screen with good pixel balancing and a grid that worked well on a non-integer situation. 
+
 The pixel transparency craze happened around me, as I had never used those shaders myself, but I liked the screenshots and pictures people were posting around with that on, so I dabbled in the idea of having a paper background option, where dark pixels would cast their shadow, and white pixels would gain some texture. It worked out fine, and now I'm always checking how the lcd background option looks in every game I try! I just didn't like it with the RGB grid, so I looked at getting something similar to lcd1x, what led to the grid RGBxMono toggle. Having options is good, right? (•‿•) 
+
 Adding a ghosting effect was a suggestion by XongleBongle the man himself, but since every handheld core already has an interframe blending option for accurate ghosting, I tried to get that bad duplicate image I used to deal with, from the terrible screen on my Dingoo A320 (is that the correct model I had?), and it ended up being a fine addition to the fun options of this LCD shader! 
 
 | Shader | Preset |
@@ -73,7 +77,8 @@ Some fun parameters to consider:
 
 I also have a simple pair of scanlines and grid overlays for 640x480 and 1280x720 (can be used in 720x720 with the proper scaling) screens.
 Some systems are just too demanding to also have a shader running, like Dreamcast and N64, and having these on can give them that nice TV look at an (almost) free performance cost. 
-Paired with Pickles' pretty robust picture options, like contrast, saturation and others, you can get a good _old school_ look for even the most demanding systems. 
+
+Paired with Pickles' pretty robust picture options, like contrast, saturation, vignete and others, you can get a good _old school_ look for even the most demanding systems. 
 
 | Overlay | 640x480 | 1280x720 |
 | --- | --- | --- |
