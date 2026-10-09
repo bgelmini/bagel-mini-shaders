@@ -80,6 +80,62 @@ Some systems are just too demanding to also have a shader running, like Dreamcas
 
 Paired with Pickles' pretty robust picture options, like contrast, saturation, vignete and others, you can get a good _old school_ look for even the most demanding systems. 
 
+## Comparisons
+
+Click any picture to open it at full size. The first picture of each set is the raw game, so you can compare it with the presets next to it.
+
+<details>
+<summary><b>CRT</b> (640x480)</summary>
+
+<table>
+  <tr>
+    <td align="center"><a href="Screenshots/bagel-CRT-mini%20Comparisons/640x480Raw.png"><img src="Screenshots/bagel-CRT-mini%20Comparisons/640x480Raw.png" width="400" alt="Raw (no shader)"></a><br><sub>Raw (no shader)</sub></td>
+    <td align="center"><a href="Screenshots/bagel-CRT-mini%20Comparisons/640x480CRT.png"><img src="Screenshots/bagel-CRT-mini%20Comparisons/640x480CRT.png" width="400" alt="bagel-CRT-mini"></a><br><sub>bagel-CRT-mini</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="Screenshots/bagel-CRT-mini%20Comparisons/640x480GoodDither.png"><img src="Screenshots/bagel-CRT-mini%20Comparisons/640x480GoodDither.png" width="400" alt="bagel-CRT-mini-GoodDither"></a><br><sub>bagel-CRT-mini-GoodDither</sub></td>
+    <td align="center"><a href="Screenshots/bagel-CRT-mini%20Comparisons/640x480Composite.png"><img src="Screenshots/bagel-CRT-mini%20Comparisons/640x480Composite.png" width="400" alt="bagel-CRT-mini-Composite"></a><br><sub>bagel-CRT-mini-Composite</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="Screenshots/bagel-CRT-mini%20Comparisons/640x480RF.png"><img src="Screenshots/bagel-CRT-mini%20Comparisons/640x480RF.png" width="400" alt="bagel-CRT-mini-RF"></a><br><sub>bagel-CRT-mini-RF</sub></td>
+    <td align="center"><a href="Screenshots/bagel-CRT-mini%20Comparisons/640x480BadRF.png"><img src="Screenshots/bagel-CRT-mini%20Comparisons/640x480BadRF.png" width="400" alt="bagel-CRT-mini-BadRF"></a><br><sub>bagel-CRT-mini-BadRF</sub></td>
+  </tr>
+</table>
+
+</details>
+
+<details>
+<summary><b>LCD</b> (Game Boy Color, 1280x720)</summary>
+
+<table>
+  <tr>
+    <td align="center"><a href="Screenshots/bagel-LCD-mini%20Comparisons/1280x720GBC-Raw.png"><img src="Screenshots/bagel-LCD-mini%20Comparisons/1280x720GBC-Raw.png" width="400" alt="Raw (no shader)"></a><br><sub>Raw (no shader)</sub></td>
+    <td align="center"><a href="Screenshots/bagel-LCD-mini%20Comparisons/1280x720GBC-Background.png"><img src="Screenshots/bagel-LCD-mini%20Comparisons/1280x720GBC-Background.png" width="400" alt="bagel-LCD-mini-Background"></a><br><sub>bagel-LCD-mini-Background</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="Screenshots/bagel-LCD-mini%20Comparisons/1280x720-GBC-BadLCD.png"><img src="Screenshots/bagel-LCD-mini%20Comparisons/1280x720-GBC-BadLCD.png" width="400" alt="bagel-LCD-mini-BadDisplay"></a><br><sub>bagel-LCD-mini-BadDisplay</sub></td>
+    <td></td>
+  </tr>
+</table>
+
+</details>
+
+<details>
+<summary><b>LCD</b> (Game Boy Advance, 720x480)</summary>
+
+<table>
+  <tr>
+    <td align="center"><a href="Screenshots/bagel-LCD-mini%20Comparisons/720x480GBA-Raw.png"><img src="Screenshots/bagel-LCD-mini%20Comparisons/720x480GBA-Raw.png" width="400" alt="Raw (no shader)"></a><br><sub>Raw (no shader)</sub></td>
+    <td align="center"><a href="Screenshots/bagel-LCD-mini%20Comparisons/720x480GBA-LCD.png"><img src="Screenshots/bagel-LCD-mini%20Comparisons/720x480GBA-LCD.png" width="400" alt="bagel-LCD-mini"></a><br><sub>bagel-LCD-mini</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="Screenshots/bagel-LCD-mini%20Comparisons/720x480GBA-FakeGhost.png"><img src="Screenshots/bagel-LCD-mini%20Comparisons/720x480GBA-FakeGhost.png" width="400" alt="bagel-LCD-mini-FakeGhost"></a><br><sub>bagel-LCD-mini-FakeGhost</sub></td>
+    <td></td>
+  </tr>
+</table>
+
+</details>
+
 | Overlay | 640x480 | 1280x720 |
 | --- | --- | --- |
 | Grid | `overlays/640x480/simple-grid.png` | `overlays/1280x720/simple-grid.png` |
