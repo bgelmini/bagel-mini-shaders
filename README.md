@@ -7,7 +7,11 @@ A collection of (hopefully) useful CRT and LCD shaders for lower resolution scre
 This is not a professional work, and while I like things to be organized, I will just explain stuff as informally as it was all done.
 The technical stuff is all described in the shader files, feel free to check and propose changes for the better! 
 
-[![bagel-CRT-mini-RF](Screenshots/bagel-CRT-mini%20Comparisons/640x480RF.png)](https://bgelmini.github.io/bagel-mini-shaders/comparisons.html)
+<p align="center">
+  <a href="https://bgelmini.github.io/bagel-mini-shaders/comparisons.html">
+    <img src="Screenshots/bagel-CRT-mini%20Comparisons/640x480RF.png" width="640" alt="bagel-CRT-mini-RF">
+  </a>
+</p>
 
 ## Installation
 
@@ -74,6 +78,9 @@ Some fun parameters to consider:
 - LCD Background: Clear pixels let a paper-coloured backing show through, dark pixels leave a shade in that background
 - Fake Ghosting:  Fake, not a real previous-frame effect, simulates a bad LCD display. 
 - Grid Mode:      Auto / 240 / 480. If the grid effect seems off, too big or too small, or even gone, the shader failed to auto detect the correct ratio from content to screen, so tweak this and one of the options should get you going. 
+
+
+## Click the image for some comparisons! 
 
 <p align="center">
   <a href="https://bgelmini.github.io/bagel-mini-shaders/comparisons.html">
