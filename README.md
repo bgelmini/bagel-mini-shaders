@@ -77,8 +77,8 @@ Paired with Pickles' pretty robust picture options, like contrast, saturation an
 
 | Overlay | 640x480 | 1280x720 |
 | --- | --- | --- |
-| Grid | `overlays/640x480/simple-grid-640x480.png` | `overlays/1280x720/simple-grid-1280x720.png` |
-| Scanlines | `overlays/640x480/simple-scanlines-640x480.png` | `overlays/1280x720/simple-scanlines-1280x720.png` |
+| Grid | `overlays/640x480/simple-grid.png` | `overlays/1280x720/simple-grid.png` |
+| Scanlines | `overlays/640x480/simple-scanlines.png` | `overlays/1280x720/simple-scanlines.png` |
 
 Installing them works the same as the shaders (see Installation above).
 
