@@ -1,6 +1,6 @@
 // Name: bagel-LCD-mini-Background
 // Author: bgelmini
-// Version 3.0
+// Version 3.6
 
 // Co-author: ClaudeAI
 // Preset from bagel-LCD-mini
@@ -14,40 +14,42 @@
 
 // Options
 // Grid Mode:      Auto / 240 / 480. Input over 300 lines gets the same grid density as 240-class.
-// Grid Style:     RGB (lcd3x) or Mono (lcd1x).
+// Grid:           Off, RGB (lcd3x) or Mono (lcd1x).
 // Border Fade:    rounded darkening at the screen edges.
 // LCD Background: light pixels let a paper-coloured backing show through, dark pixels leave a shade in that background
-// Fake Ghosting:  Spatial fake, not a real previous-frame effect, simulates a bad LCD display. 
+// Fake Ghosting:  Spatial fake, not a real previous-frame effect, simulates a bad LCD display.
 
 #pragma parameter sharpness "Sharpness" 1.0 0.3 1.0 0.05
 #pragma parameter saturation "Saturation" 1.0 0.0 2.0 0.05
 #pragma parameter brightness "Brightness" 1.0 0.5 2.5 0.05
 #pragma parameter contrast "Contrast" 1.0 0.5 2.0 0.05
 #pragma parameter scan_grid "Grid Mode (Auto/240/480)" 0.0 0.0 2.0 1.0
-#pragma parameter grid_style "Grid Style (RGB/Mono)" 1.0 0.0 1.0 1.0
+#pragma parameter grid_type "Grid (Off/RGB/Mono)" 2.0 0.0 2.0 1.0
 #pragma parameter border_on "Border Fade" 0.0 0.0 1.0 1.0
 #pragma parameter border_depth "  Border Depth" 0.25 0.0 1.0 0.05
-#pragma parameter fake_ghost "Fake Ghosting" 0.0 0.0 1.0 1.0
+// menu header only, locked at 0
+#pragma parameter fun_options "--- Fun Options - Heavier on the GPU ---" 0.0 0.0 0.001 1.0
 #pragma parameter bg_on "LCD Background" 1.0 0.0 1.0 1.0
 #pragma parameter bg_mix "  Background Mix" 0.60 0.0 1.0 0.05
 #pragma parameter bg_tint "  Background Color (White/Warm/Gray/Green)" 1.0 0.0 3.0 1.0
 #pragma parameter bg_shade_depth "  Shading Depth" 1.0 0.0 1.0 0.05
 #pragma parameter bg_shade_dist "  Shading Distance (px at 640x480)" 2.0 0.0 8.0 0.5
+#pragma parameter fake_ghost "Fake Ghosting" 0.0 0.0 1.0 1.0
 
 uniform float sharpness;
 uniform float saturation;
 uniform float brightness;
 uniform float contrast;
 uniform float scan_grid;
-uniform float grid_style;
+uniform float grid_type;
 uniform float border_on;
 uniform float border_depth;
-uniform float fake_ghost;
 uniform float bg_on;
 uniform float bg_mix;
 uniform float bg_tint;
 uniform float bg_shade_depth;
 uniform float bg_shade_dist;
+uniform float fake_ghost;
 
 // border fade shape
 const float BORDER_RADIUS = 0.025; // how far the fade reaches inward
@@ -57,94 +59,53 @@ const float BORDER_SMOOTH = 60.0;  // transition width
 const float GHOST_STRENGTH = 0.5;
 const float GHOST_LENGTH   = 5.0; // px at 640x480, trails to the right
 
-vec2 native_res() {
-    return max(u_native_resolution, vec2(1.0));
+// a + b * sin(2 * PI * q), with a cheap sine: a parabola plus one refinement step.
+// Keep it highp, some GPUs lose the grid at lower precision.
+float wave(highp float q, highp float a, highp float b) {
+    highp float u = fract(q) - 0.5;
+    highp float y = u * (16.0 * max(u, -u) - 8.0);  // max(u, -u) = abs(u)
+    return a + y * (0.775 * b + 0.225 * b * max(y, -y));
 }
 
-// scan_grid: 0 = Auto by native height, 1 = 240-class, 2 = 480-class.
-bool use_coarse_grid() {
-    if (scan_grid > 1.5) return true;
-    if (scan_grid > 0.5) return false;
-    return native_res().y > 300.0;
-}
-
-// Real (non-rounded) scale between output and input resolution, isotropic (aspect ratio preserved).
-highp float raw_grid_scale() {
-    highp vec2 res = native_res();
-    highp vec2 out_res = max(u_resolution, vec2(1.0));
-    highp vec2 raw_scale = out_res / res;
-    return max(min(raw_scale.x, raw_scale.y), 1.0);
-}
-
-// Scale rounded to the nearest integer, used by anything that needs to
-// stay "locked" to the native pixel grid (in thi case the mask), so it
-// doesn't drift irregularly when the real scale is fractional.
-// Coarse (480-class) input halves the grid resolution.
-highp float grid_scale() {
-    highp vec2 res = native_res();
-    if (use_coarse_grid()) res *= 0.5;
-    highp vec2 out_res = max(u_resolution, vec2(1.0));
-    highp vec2 s = out_res / res;
-    return max(floor(min(s.x, s.y) + 0.5), 1.0);
+// sin(2 * PI * u) for u in -0.5..0.5, same parabola as wave()
+highp float sine_half(highp float u) {
+    highp float y = u * (8.0 - 16.0 * max(u, -u));
+    return y * (0.775 + 0.225 * max(y, -y));
 }
 
 // frag_coord must stay highp. Without it, precision drops enough at
-// large screen coordinates to make the mask drift unevenly (worse
+// large screen coordinates to make the grid drift unevenly (worse
 // towards one edge of the screen).
-vec3 lcd_mask(highp vec2 frag_coord, highp float scale) {
-    const float PI = 3.14159265;
 
-    highp vec2 texel_pos = frag_coord / scale;
-    // Reducing to [0,1) via fract() before multiplying by 2*PI keeps the
-    // sin() argument small, avoiding precision loss at typical screen
-    // resolutions.
-    highp vec2 phase = fract(texel_pos);
+// Mono (lcd1x): one factor for all channels, dark gap between pixels.
+// (16 - cos) / 17 and (4 - cos) / 5
+vec3 mono_mask(highp vec2 frag_coord, highp float scale) {
+    highp vec2 cell = frag_coord / scale;
+    float yf = wave(cell.y + 0.25, 16.0 / 17.0, -1.0 / 17.0);
+    float xf = wave(cell.x + 0.25, 0.8, -0.2);
+    return vec3(yf * xf);
+}
 
-    vec2 angle = phase * 2.0 * PI;
-
-    // Mono (lcd1x): one factor for all channels, dark gap between pixels.
-    if (grid_style > 0.5) {
-        float yf = (16.0 - cos(angle.y)) / 17.0;
-        float xf = (4.0 - cos(angle.x)) / 5.0;
-        return vec3(yf * xf);
-    }
-
-    float yfactor = (16.0 + sin(angle.y)) / 17.0;
-
-    // Subpixel phases +90, -30 and -150 degrees from one sin and one cos.
+// RGB (lcd3x): subpixel phases +90, -30 and -150 degrees from one sin and one cos.
+vec3 rgb_mask(highp vec2 frag_coord, highp float scale) {
+    highp vec2 cell = frag_coord / scale;
+    float yfactor = wave(cell.y, 16.0 / 17.0, 1.0 / 17.0);
     const float K = 0.8660254;
-    float sx = sin(angle.x);
-    float cx = cos(angle.x);
+    // sin and cos from the same phase
+    highp float u = fract(cell.x) - 0.5;
+    float sx = -sine_half(u);
+    float cx = -sine_half(0.25 - max(u, -u));
     vec3 xfactors = (4.0 + vec3(cx, K * sx - 0.5 * cx, -K * sx - 0.5 * cx)) / 5.0;
-
     return yfactor * xfactors;
 }
 
-// Auto-adjusting sharp-bilinear sampling: uses the real scale, not the
-// rounded one, so it adapts on its own. Sharp when the scale is an
-// exact integer, softer when it's fractional.
-vec3 sample_sharp_bilinear(highp vec2 uv, highp float scale) {
-    highp vec2 res = native_res();
-
-    highp vec2 texel = uv * res;
-    highp vec2 s = fract(texel);
-
-    highp vec2 region_range = vec2(0.5) - vec2(0.5) / scale;
-    highp vec2 center_dist = s - vec2(0.5);
-    highp vec2 f = (center_dist - clamp(center_dist, -region_range, region_range)) * scale + vec2(0.5);
-
-    return texture2D(u_tex, (texel - s + f) / res).rgb;
-}
-
 // Gentle rounded fade
-float border_fade(vec2 coord) {
-    coord = min(coord, vec2(1.0) - coord);
-    // Interior early-out: the fade is exactly 1.0 there.
-    if (min(coord.x, coord.y) >= BORDER_RADIUS) return 1.0;
-    vec2 cdist = vec2(BORDER_RADIUS);
-    coord = cdist - min(coord, cdist);
-    float dist = sqrt(dot(coord, coord));
-    float c = clamp((cdist.x - dist) * BORDER_SMOOTH, 0.0, 1.0);
+float border_fade(vec2 uv) {
+    vec2 h = abs(uv - 0.5);  // distance from the centre
+    // interior early-out: the fade is exactly 1.0 there
+    if (max(h.x, h.y) < 0.5 - BORDER_RADIUS) return 1.0;
+    vec2 q = max(h - (0.5 - BORDER_RADIUS), 0.0);
+    float c = clamp((BORDER_RADIUS - sqrt(dot(q, q))) * BORDER_SMOOTH, 0.0, 1.0);
     return mix(1.0 - border_depth, 1.0, c);
 }
 
@@ -152,10 +113,11 @@ float border_fade(vec2 coord) {
 // half as strong.
 vec3 fake_ghosting(vec3 col) {
     vec2 echo = vec2(GHOST_LENGTH / 640.0, 0.0);
-    vec3 g1 = texture2D(u_tex, v_uv - echo).rgb;
-    vec3 g2 = texture2D(u_tex, v_uv - 2.0 * echo).rgb;
-    col = mix(col, g1, 0.5 * GHOST_STRENGTH);
-    return mix(col, g2, 0.25 * GHOST_STRENGTH);
+    // mix(mix(col, g1, a), g2, b) as one weighted sum
+    const float A = 0.5 * GHOST_STRENGTH;
+    const float B = 0.25 * GHOST_STRENGTH;
+    return col * ((1.0 - A) * (1.0 - B)) + texture2D(u_tex, v_uv - echo).rgb * (A * (1.0 - B))
+                                         + texture2D(u_tex, v_uv - 2.0 * echo).rgb * B;
 }
 
 // Cheap sin-free hash, used for the paper grain.
@@ -169,55 +131,82 @@ float bg_hash(vec2 co) {
 // shade the paper. Works on the finished LCD colour, so the grid stays
 // visible across the paper.
 vec3 lcd_background(vec3 lcd) {
-    // 0 White / 1 Warm / 2 Gray / 3 Green
-    vec3 paper = vec3(0.86);
-    if (bg_tint > 2.5)      paper = vec3(0.60, 0.66, 0.50);
-    else if (bg_tint > 1.5) paper = vec3(0.60);
-    else if (bg_tint > 0.5) paper = vec3(0.72, 0.67, 0.57);
+    // one curve through the four paper colours:
+    // 0 White (0.86) / 1 Warm (0.72, 0.67, 0.57) / 2 Gray (0.60) / 3 Green (0.60, 0.66, 0.50)
+    vec3 paper = vec3(0.86) + bg_tint * (vec3(-0.35, -0.74, -1.8) / 3.0
+               + bg_tint * (vec3(-0.04, 0.055, 0.385) + bg_tint * vec3(0.1, 0.01, -0.45) / 6.0));
 
-    // faint static grain, 2x2 output pixels per cell
-    paper += (bg_hash(floor(gl_FragCoord.xy * 0.5)) - 0.5) * 0.04;
+    // faint static grain, 2x2 output pixels per cell (highp, like the grid)
+    highp vec2 frag_coord = gl_FragCoord.xy;
+    paper += (bg_hash(floor(frag_coord * 0.5)) - 0.5) * 0.04;
 
     // shade from dark source pixels, offset down-right
-    if (bg_shade_depth > 0.0) {
-        vec2 off = vec2(bg_shade_dist) / vec2(640.0, 480.0);
-        vec3 src = texture2D(u_tex, v_uv - off).rgb;
-        float dark = clamp(1.0 - dot(src, vec3(0.299, 0.587, 0.114)), 0.0, 1.0);
-        paper *= 1.0 - 0.65 * dark * bg_shade_depth;
-    }
+    vec3 src = texture2D(u_tex, v_uv - vec2(bg_shade_dist) / vec2(640.0, 480.0)).rgb;
+    float dark = clamp(1.0 - dot(src, vec3(0.299, 0.587, 0.114)), 0.0, 1.0);
+    paper *= 1.0 - 0.65 * dark * bg_shade_depth;
 
-    float lum = clamp(dot(lcd, vec3(0.299, 0.587, 0.114)), 0.0, 1.0);
+    float lum = dot(lcd, vec3(0.299, 0.587, 0.114));
     return mix(lcd, paper, bg_mix * smoothstep(0.25, 0.85, lum));
 }
 
 void main() {
-    highp float sample_scale = max(raw_grid_scale() * sharpness, 1.0);
+    highp vec2 res = max(u_native_resolution, vec2(1.0));
+    highp vec2 inv_res = 1.0 / res;
 
-    // Never below 2. At scale 1 the RGB grid collapses into a flat tint.
-    highp float mask_scale = max(grid_scale(), 2.0);
+    // scan_grid: 0 = Auto by native height, 1 = 240-class, 2 = 480-class.
+    bool coarse = scan_grid > 1.5 || (scan_grid <= 0.5 && res.y > 300.0);
 
-    vec3 col = sample_sharp_bilinear(v_uv, sample_scale);
+    // Real scale for the sampling. Rounded scale for the grid, so it stays
+    // locked to the native pixels when the real scale is fractional. Coarse
+    // (480-class) input halves the grid resolution. Never below 2 for the
+    // grid: at scale 1 the RGB grid collapses into a flat tint.
+    highp vec2 ratio = u_resolution * inv_res;
+    highp float ratio_min = min(ratio.x, ratio.y);
+    highp float sample_scale = max(max(ratio_min, 1.0) * sharpness, 1.0);
+    // +0.501 so exact halves like 4.5x always round up
+    highp float mask_scale = max(floor((coarse ? 2.0 * ratio_min : ratio_min) + 0.501), 2.0);
 
-    if (fake_ghost >= 0.5) {
-        col = fake_ghosting(col);
+    // Auto-adjusting sharp-bilinear sampling: uses the real scale, not the
+    // rounded one, so it adapts on its own. Sharp when the scale is an exact
+    // integer, softer when it's fractional.
+    highp vec2 p = v_uv * res;
+    highp vec2 edge = floor(p + 0.5);
+    highp vec2 coord = (edge + 0.5 * clamp((p - edge) * (2.0 * sample_scale), -1.0, 1.0)) * inv_res;
+
+    // Each grid reads the picture itself, so only the chosen one is worked out.
+    vec3 col;
+    vec3 grid;
+    if (grid_type > 1.5) {
+        col = texture2D(u_tex, coord).rgb;
+        grid = mono_mask(gl_FragCoord.xy, mask_scale);
+    } else if (grid_type > 0.5) {
+        col = texture2D(u_tex, coord).rgb;
+        grid = rgb_mask(gl_FragCoord.xy, mask_scale);
+    } else {
+        col = texture2D(u_tex, coord).rgb;
+        grid = vec3(1.0);
     }
 
-    if (saturation != 1.0) {
+    // Fake Ghosting, Saturation and Border Fade share one check, so the usual
+    // presets skip all three in one go.
+    if (fake_ghost < 0.5 && border_on < 0.5 && abs(saturation - 1.0) < 0.001) {
+        // grid, linear brightness and contrast
+        col = col * (grid * (brightness * contrast)) + (0.5 - 0.5 * contrast);
+    } else {
+        if (fake_ghost >= 0.5) {
+            col = fake_ghosting(col);
+        }
+
         float luma = dot(col, vec3(0.299, 0.587, 0.114));
-        col = mix(vec3(luma), col, saturation);
+        col = luma + saturation * (col - luma);
+
+        // grid, border fade, linear brightness and contrast
+        float k = brightness * contrast;
+        if (border_on >= 0.5) {
+            k *= border_fade(v_uv);
+        }
+        col = col * (grid * k) + (0.5 - 0.5 * contrast);
     }
-
-    col *= lcd_mask(gl_FragCoord.xy, mask_scale);
-
-    if (border_on >= 0.5) {
-        col *= border_fade(v_uv);
-    }
-
-    // linear brightness
-    col *= brightness;
-
-    // contrast
-    col = (col - 0.5) * contrast + 0.5;
 
     if (bg_on >= 0.5) {
         col = lcd_background(col);
